@@ -50,8 +50,6 @@ def Top50(url):
         print("There no song starting with letter "+alpha.upper())
 
     chooseSong = int(input("Choose the number of the song you want to listen to : "))
-    print()
-    print("Visit this link and enjoy the song :)")
     link = (songUrl[chooseSong-1])
     play = webbrowser.open(link)
     print(play)
