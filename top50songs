@@ -1,1 +1,68 @@
+import requests
+import webbrowser
+from bs4 import BeautifulSoup
+import pprint
+
+url = "https://gaana.com/playlist/gaana-dj-bollywood-top-50-1"
+url2 = "https://gaana.com/playlist/gaana-dj-gaana-international-top-50"
+
+def Top50(url):
+    page = requests.get(url).text
+    soup = BeautifulSoup(page, 'lxml')
+    mainDiv = soup.find('div', class_="lastend-container details-list-paddingnone content-container artworkload")
+    lists = mainDiv.findAll("div", class_="playlist-data")
+
+    duration = []
+    t = soup.findAll('li', {'class' : "s_duration", 'data-type' : "playSong"})
+    for j in t:
+        time = j.get_text().strip().split()[0]
+        duration.append(time)
+
+    index = 1
+    mainD = {}
+    mainL = []
+    for i in lists:
+        artists = []
+        name = i.find('a').get_text()
+        link = i.find('a')["href"]
+        art = i.find('div', class_="mobile")
+        atags = art.findAll('a')
+        for j in atags:
+            artists.append(j.get_text())
+        mainL.append({'Rank' : index, 'Song' : name, 'Artist(s)' : artists, 'Duration' : duration[(index-1)], 'Song URL' : link})
+        index+=1
+    mainD = mainL
+
+    ind = 1
+    alpha = input("Enter the starting letter of the song : ").lower()
+    flag = 'Red'
+    songUrl = []
+    for i in mainD:
+        if(i['Song'].lower().startswith(alpha)):
+            a = ""
+            for k in i['Artist(s)']:
+                a = a + k + " , "
+            print(str(ind) + " . "+"'"+i['Song']+"'" + " by " + a.rstrip(" \, "))
+            songUrl.append(i['Song URL'])
+            ind+=1
+            flag = 'Green'
+    if(flag == 'Red'):
+        print("There no song starting with letter "+alpha.upper())
+
+    chooseSong = int(input("Choose the number of the song you want to listen to : "))
+    print()
+    print("Visit this link and enjoy the song :)")
+    link = (songUrl[chooseSong-1])
+    play = webbrowser.open(link)
+    print(play)
+
+print("1. Bollywood Top 50 Songs\n2. International Top 50 Songs")
+userChoice = int(input("Enter your choice : "))
+
+if(userChoice == 1):
+    Top50(url)
+elif(userChoice == 2):
+    Top50(url2)
+else:
+    print("Wrong choice. Choose from above options")
 
